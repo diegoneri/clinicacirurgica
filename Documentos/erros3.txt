@@ -1,0 +1,13 @@
+1 - Colocar campo de data na venda - ok
+2 - Corrigir tela de buscar produto (código farmacêutico) - ok
+3 - Alterar o preço na venda (desejável)
+    ou Criar campo de desconto global
+4 - Campo de nota fiscal não é obrigatório! - ok
+5 - Recebido na compra gera estoque?? - verificar
+6 - Controle de estoque - tirar código e mudar farm para código
+7 - Tipo de despesa - criar tela de cadastro - gerenciamento
+8 - Tipo de despesa - tela pqna - ok (+-)
+9 - Despesa - campo descrição
+10 - Relatorio de venda não gerou corretamente no sintetico / analitico o valor total (o valor total da venda não foi salvo corretamente (provavelmente pelo preço do atacado)) - ok
+11 - Exclusão de venda não funcionou
+

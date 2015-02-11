@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ListaPreco" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="db93449d-0fa6-4606-9ca0-7c5120c23f3c">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" forecolor="#000000" backcolor="#E7E6E6">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="3" rightIndent="3"/>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFF7E6">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontSize="10" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="3" rightIndent="1"/>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#FFFDF8"/>
+		</conditionalStyle>
+	</style>
+	<style name="subtituloBanda" forecolor="#666666" fontSize="10" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="subtituloBandaComBorda" forecolor="#666666" hAlign="Center" vAlign="Middle" fontSize="12" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box topPadding="4" leftPadding="4" bottomPadding="10" rightPadding="4">
+			<pen lineWidth="1.25" lineColor="#000000"/>
+			<topPen lineWidth="1.25" lineColor="#000000"/>
+			<leftPen lineWidth="1.25" lineColor="#000000"/>
+			<bottomPen lineWidth="1.25" lineColor="#000000"/>
+			<rightPen lineWidth="1.25" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="subtituloBandaComBordaRodape" forecolor="#666666" hAlign="Center" vAlign="Middle" fontSize="12" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box topPadding="4" leftPadding="4" bottomPadding="10" rightPadding="4">
+			<pen lineWidth="1.25" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="1.25" lineColor="#000000"/>
+			<bottomPen lineWidth="1.25" lineColor="#000000"/>
+			<rightPen lineWidth="1.25" lineColor="#000000"/>
+		</box>
+	</style>
+	<queryString>
+		<![CDATA[SELECT
+     DISTINCT(produto.`cd_produto`) AS produto_cd_produto,
+     produto.`nome` AS produto_nome,
+     produto.`marca` AS produto_marca,
+     IFNULL(produto.`cor`,'N/D') AS produto_cor,
+     produto.`valor_compra` AS produto_valor_compra,
+     produto.`valor_venda_atacado` AS preco_atacado,
+     produto.`valor_venda` AS preco_varejo,
+     IFNULL(produto.`cd_farmaceutico`,0) AS produto_cd_farmaceutico,
+     fornecedor.`nm_razao_social` AS fornecedor_nm_razao_social,
+     tamanho
+FROM
+     `fornecedor` fornecedor
+	  INNER JOIN `fornecedorproduto` fp
+	  		    ON fornecedor.`cd_fornecedor` = fp.`cd_fornecedor`
+	  INNER JOIN `produto` produto
+	  		    ON fp.`cd_produto` = produto.`cd_produto`
+GROUP BY produto_cd_produto
+ORDER BY produto_nome]]>
+	</queryString>
+	<field name="produto_cd_produto" class="java.lang.Integer"/>
+	<field name="produto_nome" class="java.lang.String"/>
+	<field name="produto_marca" class="java.lang.String"/>
+	<field name="produto_cor" class="java.lang.String"/>
+	<field name="produto_valor_compra" class="java.lang.Float"/>
+	<field name="preco_atacado" class="java.lang.Float"/>
+	<field name="preco_varejo" class="java.lang.Float"/>
+	<field name="produto_cd_farmaceutico" class="java.lang.String"/>
+	<field name="fornecedor_nm_razao_social" class="java.lang.String"/>
+	<field name="tamanho" class="java.lang.String"/>
+	<variable name="TOTAL_PAGES" class="java.lang.Integer">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}]]></variableExpression>
+	</variable>
+	<variable name="PAGE_PART_2" class="java.lang.String">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER} + ""]]></variableExpression>
+	</variable>
+	<variable name="PAGE_PART_1" class="java.lang.String" resetType="Page" incrementType="Page">
+		<variableExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de "]]></variableExpression>
+	</variable>
+	<title>
+		<band height="59">
+			<staticText>
+				<reportElement uuid="6aa01b24-d977-4311-a349-49f1e328e895" x="0" y="0" width="555" height="59" forecolor="#999999"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cirúrgica Ana Maria
+Lista de Preços]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="31">
+			<textField>
+				<reportElement uuid="4ebb2713-39e8-4675-85f6-c7ae85a7c70b" mode="Transparent" x="0" y="0" width="555" height="31" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30">
+			<staticText>
+				<reportElement uuid="b7f1bacd-58a2-4ed2-8a81-3566cf1ee18a" style="table_TH" x="0" y="0" width="67" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e89186ff-9629-4a19-ba09-c6f7896eb18c" style="table_TH" x="67" y="0" width="213" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a21e5fdf-bcc1-481f-b224-fc2eec3e0fd1" style="table_TH" x="280" y="0" width="63" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a21e5fdf-bcc1-481f-b224-fc2eec3e0fd1" style="table_TH" x="343" y="0" width="61" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tamanho]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="727b1fb4-39a1-465e-8a4e-59a2211b87cd" style="table_TH" x="404" y="0" width="75" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Atacado]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a77680f2-b811-4991-adff-b2ef8bc95609" style="table_TH" x="479" y="0" width="75" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Varejo]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="02fc2664-d113-4523-84ac-6f40ed808f53" style="table_TD" x="67" y="0" width="213" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{produto_nome}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="df26d444-1832-4405-a951-0f26950d974e" style="table_TD" x="280" y="0" width="63" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{produto_cor}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="2fcf7c07-d776-419b-aeb9-cca0d6abb2ea" style="table_TD" x="479" y="0" width="75" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{preco_varejo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
+				<reportElement uuid="6412cd67-153a-410f-bcf8-32fdf93dc7b3" style="table_TD" x="404" y="0" width="75" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{preco_atacado}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="2a7c7ffe-a690-4372-9030-e42d92760892" style="table_TD" x="0" y="0" width="67" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{produto_cd_farmaceutico}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="df26d444-1832-4405-a951-0f26950d974e" style="table_TD" x="343" y="0" width="61" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{tamanho}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="13">
+			<textField isStretchWithOverflow="true" evaluationTime="Auto">
+				<reportElement uuid="6fd78ac4-d474-4288-ac9e-e4b1f69a5b8a" x="375" y="0" width="179" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{PAGE_PART_1} + $V{PAGE_PART_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE&apos;,&apos; dd &apos;de&apos; MMMMM &apos;de&apos; yyyy">
+				<reportElement uuid="726fab76-93b8-4608-9bbe-0e467389504f" x="0" y="0" width="300" height="13"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

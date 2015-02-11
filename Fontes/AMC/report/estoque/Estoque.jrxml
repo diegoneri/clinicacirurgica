@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Estoque" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="db93449d-0fa6-4606-9ca0-7c5120c23f3c">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="397"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" forecolor="#000000" backcolor="#E7E6E6" fontSize="11">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="3" rightIndent="3"/>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFF7E6">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontSize="10" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<paragraph leftIndent="3" rightIndent="1"/>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#FFFDF8"/>
+		</conditionalStyle>
+	</style>
+	<style name="subtituloBanda" forecolor="#666666" fontSize="10" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<style name="subtituloBandaComBorda" forecolor="#666666" hAlign="Center" vAlign="Middle" fontSize="12" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box topPadding="4" leftPadding="4" bottomPadding="10" rightPadding="4">
+			<pen lineWidth="1.25" lineColor="#000000"/>
+			<topPen lineWidth="1.25" lineColor="#000000"/>
+			<leftPen lineWidth="1.25" lineColor="#000000"/>
+			<bottomPen lineWidth="1.25" lineColor="#000000"/>
+			<rightPen lineWidth="1.25" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="subtituloBandaComBordaRodape" forecolor="#666666" hAlign="Center" vAlign="Middle" fontSize="12" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box topPadding="4" leftPadding="4" bottomPadding="10" rightPadding="4">
+			<pen lineWidth="1.25" lineColor="#000000"/>
+			<topPen lineWidth="0.0" lineColor="#000000"/>
+			<leftPen lineWidth="1.25" lineColor="#000000"/>
+			<bottomPen lineWidth="1.25" lineColor="#000000"/>
+			<rightPen lineWidth="1.25" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="dataRefArg" class="java.util.Date">
+		<parameterDescription><![CDATA[Data de referência de compra e venda]]></parameterDescription>
+		<defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     produto.`cd_produto` AS produto_cd_produto,
+     IFNULL(produto.`cd_farmaceutico`,'N/D') AS produto_cd_farmaceutico,
+     produto.`nome` AS produto_nome,
+     produto.`marca` AS produto_marca,
+     produto.`cor` AS produto_cor,
+     produto.`valor_compra` AS produto_valor_compra,
+     produto.`valor_venda_atacado` AS preco_atacado,
+     produto.`valor_venda` AS preco_varejo,
+     IFNULL(produto.`qtde_estoque`,0) AS produto_qtde_estoque,
+     IFNULL(
+	  		  (SELECT sum(qtde_produto)
+			     FROM vendaproduto  vp
+		  INNER JOIN venda v
+		          ON v.cd_venda = vp.cd_venda
+		       WHERE vp.cd_produto = produto.cd_produto
+		       	AND DATE_FORMAT(v.data_venda,'%Y%m') = DATE_FORMAT($P{dataRefArg},'%Y%m')
+			 GROUP BY vp.cd_produto),0) as produto_qtde_vendida,
+     IFNULL(
+     		  (SELECT sum(qtde_produto)
+			     FROM pedidoproduto pp
+		  INNER JOIN pedido p
+		          ON p.cd_pedido = pp.cd_pedido
+		       WHERE pp.cd_produto = produto.cd_produto
+					AND DATE_FORMAT(p.data_pedido,'%Y%m') = DATE_FORMAT($P{dataRefArg},'%Y%m')
+			 GROUP BY pp.cd_produto)
+	  ,0) AS produto_qtde_comprada,
+     fornecedor.`nm_razao_social` AS fornecedor_nm_razao_social
+FROM
+     `fornecedor` fornecedor
+	  INNER JOIN `fornecedorproduto` fp
+	  		    ON fornecedor.`cd_fornecedor` = fp.`cd_fornecedor`
+	  INNER JOIN `produto` produto
+	  		    ON fp.`cd_produto` = produto.`cd_produto`
+     LEFT JOIN `vendaproduto` vendaproduto
+     			 ON vendaproduto.cd_produto = produto.cd_produto
+     LEFT JOIN venda
+     	       on venda.cd_venda = vendaproduto.cd_venda
+  	  LEFT JOIN pedidoproduto
+  	  			 ON pedidoproduto.cd_produto = produto.cd_produto
+  	  LEFT JOIN pedido
+  	  			 ON pedido.cd_pedido = pedidoproduto.cd_pedido
+where produto.cd_produto = produto.cd_produto
+group by produto.cd_produto
+order by produto.nome]]>
+	</queryString>
+	<field name="produto_cd_produto" class="java.lang.Integer"/>
+	<field name="produto_cd_farmaceutico" class="java.lang.String"/>
+	<field name="produto_nome" class="java.lang.String"/>
+	<field name="produto_marca" class="java.lang.String"/>
+	<field name="produto_cor" class="java.lang.String"/>
+	<field name="produto_valor_compra" class="java.lang.Float"/>
+	<field name="preco_atacado" class="java.lang.Float"/>
+	<field name="preco_varejo" class="java.lang.Float"/>
+	<field name="produto_qtde_estoque" class="java.lang.Long"/>
+	<field name="produto_qtde_vendida" class="java.math.BigDecimal"/>
+	<field name="produto_qtde_comprada" class="java.math.BigDecimal"/>
+	<field name="fornecedor_nm_razao_social" class="java.lang.String"/>
+	<variable name="PAGE_PART_2" class="java.lang.String">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER} + ""]]></variableExpression>
+	</variable>
+	<variable name="PAGE_PART_1" class="java.lang.String" resetType="Page" incrementType="Page">
+		<variableExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de "]]></variableExpression>
+	</variable>
+	<variable name="mesRef" class="java.lang.String"/>
+	<variable name="produto_qtde_estoque_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{produto_qtde_estoque}]]></variableExpression>
+	</variable>
+	<variable name="produto_valor_compra_1" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{produto_valor_compra} * $F{produto_qtde_estoque}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="59">
+			<staticText>
+				<reportElement uuid="6aa01b24-d977-4311-a349-49f1e328e895" x="0" y="0" width="555" height="59" forecolor="#999999"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cirúrgica Ana Maria
+Controle de Estoque]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16">
+			<textField>
+				<reportElement uuid="4ebb2713-39e8-4675-85f6-c7ae85a7c70b" mode="Transparent" x="0" y="0" width="555" height="16" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30">
+			<staticText>
+				<reportElement uuid="79ab3883-0c29-49ed-864b-335df8a1a1a5" style="table_TH" x="0" y="0" width="70" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e89186ff-9629-4a19-ba09-c6f7896eb18c" style="table_TH" x="70" y="0" width="159" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a21e5fdf-bcc1-481f-b224-fc2eec3e0fd1" style="table_TH" x="229" y="0" width="122" height="30" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fornecedor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a77680f2-b811-4991-adff-b2ef8bc95609" style="table_TH" x="351" y="0" width="55" height="30" backcolor="#EEEEEE"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+					<paragraph leftIndent="1" rightIndent="1" tabStopWidth="40"/>
+				</textElement>
+				<text><![CDATA[Quantidade em Estoque]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="727b1fb4-39a1-465e-8a4e-59a2211b87cd" style="table_TH" x="474" y="0" width="81" height="30" backcolor="#EEEEEE"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Preço total dos itens em estoque]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="727b1fb4-39a1-465e-8a4e-59a2211b87cd" style="table_TH" x="406" y="0" width="68" height="30" backcolor="#EEEEEE"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+					<paragraph leftIndent="8"/>
+				</textElement>
+				<text><![CDATA[Preço de Custo Unitário]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="df26d444-1832-4405-a951-0f26950d974e" style="table_TD" x="229" y="0" width="122" height="15"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fornecedor_nm_razao_social}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="83603451-8f2a-4f56-8db9-8f1ac2aefbb3" style="table_TD" x="0" y="0" width="70" height="15"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{produto_cd_farmaceutico}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="e29fcb10-b240-4157-b9e8-be62e4551fd3" style="table_TD" x="474" y="0" width="81" height="15"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{produto_valor_compra} * $F{produto_qtde_estoque}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="02fc2664-d113-4523-84ac-6f40ed808f53" style="table_TD" x="70" y="0" width="159" height="15"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{produto_nome}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="2fcf7c07-d776-419b-aeb9-cca0d6abb2ea" style="table_TD" x="351" y="0" width="55" height="15"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{produto_qtde_estoque}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="257d70ac-7c2e-41ec-bfd5-5f418126d6c6" style="table_TD" x="406" y="0" width="68" height="15"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{produto_valor_compra}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="13">
+			<textField pattern="EEEEE&apos;,&apos; dd &apos;de&apos; MMMMM &apos;de&apos; yyyy">
+				<reportElement uuid="726fab76-93b8-4608-9bbe-0e467389504f" x="0" y="0" width="300" height="13"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" evaluationTime="Auto">
+				<reportElement uuid="6fd78ac4-d474-4288-ac9e-e4b1f69a5b8a" x="375" y="0" width="179" height="13"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{PAGE_PART_1} + $V{PAGE_PART_2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="24">
+			<textField>
+				<reportElement uuid="1d7303cb-e133-4243-9651-07dcfaf1dad0" style="table_TD" x="229" y="9" width="50" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$V{produto_qtde_estoque_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement uuid="290b46cc-ac08-4c79-bb5e-7a128ab22bc7" style="table_TD" x="401" y="9" width="100" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$V{produto_valor_compra_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="a77680f2-b811-4991-adff-b2ef8bc95609" style="table_TH" x="70" y="9" width="159" height="15" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quantidades em estoque]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a77680f2-b811-4991-adff-b2ef8bc95609" style="table_TH" x="279" y="9" width="122" height="15" backcolor="#EEEEEE"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Totais em estoque]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>
